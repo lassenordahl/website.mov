@@ -1,11 +1,29 @@
 @import "../styles/types.scss";
 
 .main {
-  background: rgb(255,255,255);
-  color: black;
+  width: 100vw;
   height: 100vh;
+  background: black;
+}
+
+.body {
+  color: black;
+  height: calc(100vh - 15rem);
+  width: calc(100vw - 10rem);
   overflow-y: auto;
   display: flex;
   align-items: center;
   justify-content: center;
+  margin-left: 10rem;
+  margin-bottom: 15rem;
+  position: relative;
+}
+
+.title {
+  position: absolute;
+  top: 1.5rem;
+  left: 3rem;
+  text-decoration: underline;
+  z-index: 10;
+  color: white;
 }

@@ -1,0 +1,22 @@
+.youtubeVideo {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 10;
+  border-radius: 8px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: translate(-50%, -50%) skew(10deg, 15deg) rotateX(-10deg)
+    rotateY(5deg);
+}
+
+.circle {
+  margin-top: 480px;
+  width: 300px;
+  height: 30px;
+  background-color: #a5a5a5;
+  border-radius: 50%;
+  cursor: pointer;
+}

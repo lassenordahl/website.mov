@@ -1,7 +1,9 @@
-import { useState } from "react";
 import Head from "next/head";
 
 import styles from "./index.module.scss";
+import { Canvas } from "@react-three/fiber";
+import { VideoPanel } from "../components/videoPanel";
+import YouTubeVideo from "../components/youtubeVideo";
 
 export default function Home() {
   return (
@@ -13,6 +15,10 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className={styles.main}>
+        <div className={styles.body}>
+          <YouTubeVideo />
+        </div>
+        <h1 className={styles.title}>david.mov</h1>
       </main>
     </>
   );
