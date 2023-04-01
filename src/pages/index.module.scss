@@ -1,0 +1,85 @@
+@import "../styles/types.scss";
+
+.main {
+  background: rgb(255,255,255);
+  background: radial-gradient(circle, rgba(255,255,255,1) 35%, rgba(189,189,189,1) 100%);
+  color: black;
+  height: 100vh;
+  overflow-y: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 5rem;
+
+  h4 {
+    margin-bottom: 0;
+  }
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+
+.titleTag {
+  font-weight: 400;
+  text-decoration: italic;
+  margin-bottom: 0;
+}
+
+.link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  text-decoration: none;
+
+  &:focus {
+    outline: none;
+  }
+
+  p {
+    color: blue;
+    text-decoration: underline;
+  }
+
+  span {
+    @include caption;
+  }
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+
+  p {
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+  }
+}
+
+.signature {
+  position: absolute;
+  color: gray;
+  bottom: 1rem;
+  font-size: 12px;
+
+  a {
+    color: gray;
+  }
+}
