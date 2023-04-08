@@ -18,6 +18,6 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "src/pages/index.jsx", "src/components/videoPanel.jsx", "src/components/button.jsx", "src/components/youtubeVideo.jsx"],
   "exclude": ["node_modules"]
 }

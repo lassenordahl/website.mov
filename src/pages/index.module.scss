@@ -1,21 +1,27 @@
 @import "../styles/types.scss";
 
+.light {
+  background: white;
+  color: black;
+}
+
+.dark {
+  background: black;
+  color: white;
+}
+
 .main {
   width: 100vw;
   height: 100vh;
-  background: black;
 }
 
 .body {
-  color: black;
-  height: calc(100vh - 15rem);
-  width: calc(100vw - 10rem);
+  height: calc(100vh);
+  width: calc(100vw);
   overflow-y: auto;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-left: 10rem;
-  margin-bottom: 15rem;
   position: relative;
 }
 
@@ -25,5 +31,5 @@
   left: 3rem;
   text-decoration: underline;
   z-index: 10;
-  color: white;
+  cursor: pointer;
 }
