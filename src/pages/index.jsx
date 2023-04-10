@@ -52,14 +52,6 @@ const Content = () => {
         <ambientLight intensity={isDarkMode ? 0.3 : 1} />
         <pointLight position={[1, 100, 1]} intensity={isDarkMode ? 0.5 : 0} />
         {client && <Model path="/assets/crt_monitor.glb" />}
-        {client && (
-          <Model
-            path="/assets/low_poly_desk.glb"
-            position={[1, -470, 1]}
-            size={[400, 400, 400]}
-            rotation={[0, 1.57, 0]}
-          />
-        )}
         <PerspectiveCamera
           makeDefault
           position={cameraConfig.position}

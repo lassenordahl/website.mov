@@ -14,7 +14,7 @@ const iframeVariants = {
 };
 
 const YouTubeVideo = ({ onReady }) => {
-  const [videoId, _] = useState("SHOf1Wlgpek");
+  const [videoId, _] = useState(process.env.NEXT_PUBLIC_VIDEO_ID);
   const playerRef = useRef(null);
 
   useEffect(() => {
