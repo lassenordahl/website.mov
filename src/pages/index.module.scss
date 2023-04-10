@@ -3,11 +3,13 @@
 .light {
   background: white;
   color: black;
+  transition: background 0.2s;
 }
 
 .dark {
   background: black;
   color: white;
+  transition: background 0.2s;
 }
 
 .main {
@@ -27,8 +29,9 @@
 
 .title {
   position: absolute;
-  top: 1.5rem;
-  left: 3rem;
+  left: 50%;
+  top: 25%;
+  transform: translate(-50%, -50%);
   text-decoration: underline;
   z-index: 10;
   cursor: pointer;

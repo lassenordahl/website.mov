@@ -1,16 +1,16 @@
 .youtubeVideo {
   position: absolute;
+  opacity: 80%;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%);
   z-index: 10;
   border-radius: 8px;
   overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
-  // box-shadow: rgba(50, 50, 93, 0.25) 0px 13px 27px -5px,
-  //   rgba(0, 0, 0, 0.3) 0px 8px 16px -8px;
+  transform: translate(-50%, -50%) rotateX(5deg) rotateY(5deg);
+  filter: blur(.25px);
 }
 
 .circle {

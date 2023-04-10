@@ -1,83 +1,76 @@
-import { useRef, useContext, useMemo, useEffect } from "react";
+import { useContext, useState, useRef, useEffect } from "react";
 import Head from "next/head";
-import { Canvas, extend } from "@react-three/fiber";
-import { OrbitControls, Box, Line } from "@react-three/drei";
-import * as THREE from "three";
-import { MeshLine, MeshLineMaterial } from "three.meshline";
+import { Canvas, useThree } from "@react-three/fiber";
+import { useGLTF, PerspectiveCamera, OrbitControls } from "@react-three/drei";
+
+import { useClient } from "../hooks";
+import { ThemeContext, ThemeProvider } from "../context/themeContext";
+import YouTubeVideo from "../components/youtubeVideo";
+import cameraConfig from "../configs/camera.json";
 
 import styles from "./index.module.scss";
-import { ThemeContext, ThemeProvider } from "../context/themeContext";
-import YouTubeVideo, { VideoTexture } from "../components/youtubeVideo";
 
-extend({ MeshLine, MeshLineMaterial });
-
-function BoxComponent() {
-  const mesh = useRef();
-  const { isDarkMode } = useContext(ThemeContext);
-
-  const edgesGeometry = new THREE.EdgesGeometry(new THREE.BoxGeometry(), 1);
-  const lineSegments = new THREE.LineSegments(edgesGeometry);
-  const meshLine = new MeshLine();
-  meshLine.setGeometry(lineSegments.geometry);
-
-  const edgesMaterial = useMemo(
-    () =>
-      new MeshLineMaterial({
-        color: isDarkMode ? "white" : "black",
-        lineWidth: 0.02,
-      }),
-    [isDarkMode]
-  );
+const Model = ({ path, position, size, rotation }) => {
+  const { nodes, materials, scene } = useGLTF(path);
+  const { scene: r3fScene, camera } = useThree();
+  const groupRef = useRef();
 
   useEffect(() => {
-    edgesMaterial.color.set(isDarkMode ? "white" : "black");
-    edgesMaterial.needsUpdate = true;
-  }, [isDarkMode, edgesMaterial]);
+    if (groupRef.current) {
+      if (position) scene.position.set(position[0], position[1], position[2]);
+      if (size) scene.scale.set(size[0], size[1], size[2]);
+      if (rotation) scene.rotation.set(rotation[0], rotation[1], rotation[2]);
 
-  return (
-    <group>
-      <boxBufferGeometry ref={mesh} args={[10, 10, 10]} position={[0, 0, 0]}>
-        <meshBasicMaterial
-          attach="material"
-          color={isDarkMode ? "white" : "black"}
-        />
-      </boxBufferGeometry>
-      <EdgesLine
-        geometry={meshLine.geometry}
-        material={edgesMaterial}
-        position={[0, 0, 0]}
-      />
-    </group>
-  );
-}
+      r3fScene.add(scene);
+      return () => {
+        r3fScene.remove(scene);
+      };
+    }
+  }, [r3fScene, scene, position, size, rotation]);
 
-function EdgesLine({ geometry, material, position }) {
+  return <group ref={groupRef}></group>;
+};
+
+function Wall({ position, rotation, dimensions }) {
   return (
-    <mesh position={position}>
-      <bufferGeometry attach="geometry" {...geometry} />
-      <meshLineMaterial attach="material" {...material} />
+    <mesh position={position} rotation={rotation}>
+      <boxBufferGeometry args={dimensions} />
+      <meshStandardMaterial color="grey" />
     </mesh>
   );
 }
 
 const Content = () => {
   const { isDarkMode, toggleTheme } = useContext(ThemeContext);
+  const { client } = useClient();
 
   const themeClass = isDarkMode ? styles.dark : styles.light;
 
   return (
     <main className={`${styles.main} ${themeClass}`}>
       <Canvas>
-        <ambientLight />
-        <pointLight position={[10, 10, 10]} />
-        <BoxComponent />
-        {/* <VideoTexture /> */}
-        <OrbitControls />
+        <ambientLight intensity={isDarkMode ? 0.3 : 1} />
+        <pointLight position={[1, 100, 1]} intensity={isDarkMode ? 0.5 : 0} />
+        {client && <Model path="/assets/crt_monitor.glb" />}
+        {client && (
+          <Model
+            path="/assets/low_poly_desk.glb"
+            position={[1, -470, 1]}
+            size={[400, 400, 400]}
+            rotation={[0, 1.57, 0]}
+          />
+        )}
+        <PerspectiveCamera
+          makeDefault
+          position={cameraConfig.position}
+          rotation={cameraConfig.rotation}
+        />
+        {/* <OrbitControls /> */}
       </Canvas>
-      <h1 className={styles.title} onClick={toggleTheme}>
-        david.mov
-      </h1>
       <YouTubeVideo />
+      <h2 className={styles.title} onClick={toggleTheme}>
+        david.mov
+      </h2>
     </main>
   );
 };
