@@ -28,7 +28,7 @@
     "src/components/youtubeVideo.jsx",
     "src/pages/_document.jsx",
     "src/pages/_app.jsx",
-    "assets/**/*.glb",
+    "assets/**/*.glb", "src/components/loadingAnimation.jsx",
   ],
   "exclude": ["node_modules"]
 }

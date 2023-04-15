@@ -1,15 +1,32 @@
 @import "../styles/types.scss";
 
+.computer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: black;
+
+}
+
+.computer iframe {
+  // width: 170px;
+  // height: 150px;
+  border: 0;
+  border-radius: 3px;
+  filter: grayscale(0.2);
+  max-width: 55vw;
+}
+
 .light {
   background: white;
   color: black;
-  transition: background 0.2s;
+  transition: background 0.5s;
 }
 
 .dark {
   background: black;
   color: white;
-  transition: background 0.2s;
+  transition: background 0.5s;
 }
 
 .main {
@@ -30,9 +47,80 @@
 .title {
   position: absolute;
   left: 50%;
-  top: 25%;
+  top: 12%;
   transform: translate(-50%, -50%);
-  text-decoration: underline;
   z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  h2 {
+    text-decoration: underline;
+    margin-bottom: 0rem;
+  }
+}
+
+.darkmode {
+  position: absolute;
+  top: calc(10% + 4rem);
+  left: 50%;
+  transform: translate(-50%, -50%);
   cursor: pointer;
+}
+
+.social {
+  position: absolute;
+  bottom: 1rem;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.scroll {
+  position: absolute;
+  right: 0;
+  top: 0;
+  height: calc(100vh - 2rem);
+  width: 2rem;
+  margin-right: 1rem;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+
+.dark .scrollbar {
+  border: 2px solid white;
+}
+
+.scrollbar {
+  height: 12rem;
+  width: 2rem;
+  border: 2px solid black;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: grab;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.loader {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+
+
+  span {
+    transition: opacity 0.3s;
+  }
 }

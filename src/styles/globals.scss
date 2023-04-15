@@ -1,5 +1,13 @@
 @import url('https://fonts.googleapis.com/css2?family=Sono:wght@200;300;400&display=swap');
 
+body, #root {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
 // =============================================================================
 // Normalize.scss based on Nicolas Gallagher and Jonathan Neal's
 // normalize.css v2.1.3 | MIT License | git.io/normalize
