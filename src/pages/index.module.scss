@@ -31,6 +31,7 @@
 .main {
   width: 100vw;
   height: 100vh;
+  background: linear-gradient(to bottom, rgba(255,255,255,1) 0%, rgb(196, 196, 196) 100%);
 }
 
 .body {
@@ -122,8 +123,30 @@
   left: 50%;
   transform: translate(-50%, -50%);
 
-
   span {
     transition: opacity 0.3s;
+  }
+}
+
+.cta {
+  position: absolute;
+  bottom: 3rem;
+  left: 50%;
+  transform: translate(-50%);
+  display: flex;
+  color: black;
+  gap: 3rem;
+
+  div {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2rem;
+    cursor: pointer;
+    transition: font-weight 0.3s ease-in-out;
+
+    &:hover {
+      font-weight: 800;
+    }
   }
 }

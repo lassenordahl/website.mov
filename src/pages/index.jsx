@@ -1,32 +1,55 @@
-import { useContext, useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import Head from "next/head";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { Canvas, useThree } from "@react-three/fiber";
 import {
   useGLTF,
   Html,
   PresentationControls,
   Sky,
-  OrbitControls,
-  Stage,
+  Plane,
 } from "@react-three/drei";
-import { Sun, Moon, AlignJustify } from "react-feather";
+import { ArrowLeft, ArrowRight, AlignJustify } from "react-feather";
 import { motion } from "framer-motion";
 import * as THREE from "three";
 
-import { useClient } from "../hooks";
-import { ThemeContext, ThemeProvider } from "../context/themeContext";
+import { useClient, useTimeline } from "../hooks";
+import { ThemeProvider } from "../context/themeContext";
 import { LoadingAnimation } from "../components/loadingAnimation";
 
 import styles from "./index.module.scss";
 
-const videoId = process.env.NEXT_PUBLIC_VIDEO_ID;
+const videoIds = [
+  process.env.NEXT_PUBLIC_VIDEO_ID_ONE,
+  process.env.NEXT_PUBLIC_VIDEO_ID_TWO,
+  process.env.NEXT_PUBLIC_VIDEO_ID_THREE,
+];
 
-const Model = ({ path, zoom }) => {
+export const fadeIn = (delay, duration) => ({
+  initial: { opacity: 0, y: 20 },
+  animate: { opacity: 1, y: 0, transition: { duration: duration || 0.5, delay: delay } },
+});
+
+const Model = ({ path, zoom, video }) => {
   const { scene } = useGLTF(path);
+  const { gl } = useThree();
+
+  // Enable shadows in the WebGLRenderer
+  gl.shadowMap.enabled = true;
+  gl.shadowMap.type = THREE.PCFSoftShadowMap;
 
   const getZoom = () => {
     return (zoom / 80) * 1.5;
-  }
+  };
+
+  const enableShadows = (object) => {
+    if (object.material) object.material.shadowSide = THREE.DoubleSide;
+    object.castShadow = true;
+    object.receiveShadow = true;
+    object.children.forEach(enableShadows);
+  };
+
+  // Enable shadows for the object
+  enableShadows(scene);
 
   return (
     <PresentationControls
@@ -41,13 +64,33 @@ const Model = ({ path, zoom }) => {
         position={[-1.7, -2.2, getZoom()]}
         scale={[0.8, 0.8, 0.8]}
       >
-        <Html wrapperClass={styles.computer} position={[2.05, 3, 0]}>
+        <Html wrapperClass={styles.computer} position={[2.1, 3, 0]}>
           <iframe
             style={{ transform: `scale(${0.9 + 0.3 * (zoom / 50)}` }}
-            src={`https://www.youtube.com/embed/${videoId}`}
+            src={`https://www.youtube.com/embed/${video}?autoplay=1`}
           />
         </Html>
       </primitive>
+      <Plane
+        args={[4, 12]}
+        rotation={[-Math.PI / 2, 0, 0]}
+        position={[0, -1.9, 0]}
+        receiveShadow
+      >
+        <meshStandardMaterial attach="material" color="white" />
+      </Plane>
+      <directionalLight
+        position={[0, 5, -2]}
+        intensity={1}
+        castShadow
+        shadow-mapSize-width={1024}
+        shadow-mapSize-height={1024}
+        shadow-camera-far={20}
+        shadow-camera-left={-10}
+        shadow-camera-right={5}
+        shadow-camera-top={5}
+        shadow-camera-bottom={-5}
+      />
     </PresentationControls>
   );
 };
@@ -56,6 +99,8 @@ const Content = () => {
   const scrollContainerRef = useRef(null);
   const [zoom, setZoom] = useState(0);
   const { client } = useClient();
+  const { step, next, prev } = useTimeline(0, videoIds.length - 1, true);
+  const [video, setVideo] = useState(videoIds[step]);
 
   const handleDrag = (info) => {
     const scrollbarHeight = 12 * 16; // Height of the scrollbar in pixels (assuming 1rem = 16px)
@@ -85,20 +130,45 @@ const Content = () => {
     return { top: -(containerHeight - scrollbarHeight - padding), bottom: 0 };
   };
 
+  useEffect(() => {
+    // If step changes, set the new video ID.
+    setVideo(videoIds[step]);
+  }, [step]);
+
+  console.log(video);
+
   return (
     <main className={`${styles.main}`}>
-      <Canvas>
-        <ambientLight intensity={1} />
-        <ambientLight intensity={0.5} />
-        <Sky distance={450000} sunPosition={[0, 40, 0]} inclination={0} />
-        {client && <Model path="/assets/monitor.glb" zoom={zoom} />}
-      </Canvas>
+      <motion.div
+        initial="initial"
+        animate="animate"
+        variants={fadeIn(1.2, 1)}
+        style={{ width: "100vw", height: "100vh" }}
+      >
+        <Canvas>
+          <ambientLight intensity={0.5} />
+          <pointLight position={[-10, 10, 0]} intensity={0.8} />
+          {client && (
+            <Model path="/assets/monitor.glb" zoom={zoom} video={video} />
+          )}
+        </Canvas>
+      </motion.div>
       <div className={styles.title}>
-        <h2>david.mov</h2>
-        <p>Please enjoy.</p>
+        <motion.h2 initial="initial" animate="animate" variants={fadeIn(0)}>
+          david.mov
+        </motion.h2>
+        <motion.p initial="initial" animate="animate" variants={fadeIn(0.3)}>
+          Please enjoy.
+        </motion.p>
       </div>
       {!client && <LoadingAnimation className={styles.loader} />}
-      <div className={styles.scroll} ref={scrollContainerRef}>
+      <motion.div
+        initial="initial"
+        animate="animate"
+        variants={fadeIn(1.5)}
+        className={styles.scroll}
+        ref={scrollContainerRef}
+      >
         <motion.div
           className={styles.scrollbar}
           drag="y"
@@ -108,6 +178,24 @@ const Content = () => {
           dragMomentum={false}
         >
           <AlignJustify />
+        </motion.div>
+      </motion.div>
+      <div className={styles.cta}>
+        <motion.div
+          initial="initial"
+          animate="animate"
+          variants={fadeIn(0.6)}
+          onClick={() => prev()}
+        >
+          <ArrowLeft /> prev
+        </motion.div>
+        <motion.div
+          initial="initial"
+          animate="animate"
+          variants={fadeIn(0.9)}
+          onClick={() => next()}
+        >
+          next <ArrowRight />
         </motion.div>
       </div>
     </main>
