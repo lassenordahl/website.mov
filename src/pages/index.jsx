@@ -1,7 +1,14 @@
 import { useContext, useState, useRef, useEffect } from "react";
 import Head from "next/head";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { useGLTF, Html, PresentationControls, Sky } from "@react-three/drei";
+import {
+  useGLTF,
+  Html,
+  PresentationControls,
+  Sky,
+  OrbitControls,
+  Stage,
+} from "@react-three/drei";
 import { Sun, Moon, AlignJustify } from "react-feather";
 import { motion } from "framer-motion";
 import * as THREE from "three";
@@ -14,37 +21,12 @@ import styles from "./index.module.scss";
 
 const videoId = process.env.NEXT_PUBLIC_VIDEO_ID;
 
-const CrtPlane = () => {
-  const vertexShader = `
-    varying vec2 vUv;
-    void main() {
-      vUv = uv;
-      gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-    }
-  `;
-
-  const fragmentShader = `
-    uniform vec3 color;
-    varying vec2 vUv;
-    void main() {
-      gl_FragColor = vec4(color, 1.0);
-    }
-  `;
-
-  return (
-    <mesh position-z={4}>
-      <planeGeometry args={[1, 1]} />
-      <shaderMaterial
-        vertexShader={vertexShader}
-        fragmentShader={fragmentShader}
-        uniforms={{ color: { value: new THREE.Color("red") } }}
-      />
-    </mesh>
-  );
-};
-
 const Model = ({ path, zoom }) => {
   const { scene } = useGLTF(path);
+
+  const getZoom = () => {
+    return (zoom / 80) * 1.5;
+  }
 
   return (
     <PresentationControls
@@ -54,44 +36,40 @@ const Model = ({ path, zoom }) => {
       azimuth={[-0.1, 0.1]}
       config={{ mass: 5, tension: 350, friction: 40 }}
     >
-      <primitive object={scene} position-z={-400 + zoom * 2} rotation-y={4.7}>
-        <Html wrapperClass={styles.computer} position={[0, 0, 0]}>
+      <primitive
+        object={scene}
+        position={[-1.7, -2.2, getZoom()]}
+        scale={[0.8, 0.8, 0.8]}
+      >
+        <Html wrapperClass={styles.computer} position={[2.05, 3, 0]}>
           <iframe
-            style={{ transform: `scale(${0.7 + 0.3 * (zoom / 50)}` }}
+            style={{ transform: `scale(${0.9 + 0.3 * (zoom / 50)}` }}
             src={`https://www.youtube.com/embed/${videoId}`}
           />
         </Html>
       </primitive>
-      {/* <CrtPlane /> */}
     </PresentationControls>
   );
 };
 
 const Content = () => {
-  const { isDarkMode, toggleTheme } = useContext(ThemeContext);
   const scrollContainerRef = useRef(null);
   const [zoom, setZoom] = useState(0);
   const { client } = useClient();
-  // const client = false;
-
-  const themeClass = isDarkMode ? styles.dark : styles.light;
 
   const handleDrag = (info) => {
     const scrollbarHeight = 12 * 16; // Height of the scrollbar in pixels (assuming 1rem = 16px)
 
-    if (!scrollContainerRef.current) {
-      return;
-    }
+    if (!scrollContainerRef.current) return;
 
     const containerHeight = scrollContainerRef.current.offsetHeight;
 
-    // Calculate the percentage based on the y position
+    // Calculate the percentage based on the y position.
     const percentage =
       100 - (info.point.y / (containerHeight - scrollbarHeight)) * 100;
 
     // Clamp the percentage value between 0 and 100
     const clampedPercentage = Math.floor(Math.min(Math.max(percentage, 0), 80));
-
     setZoom(clampedPercentage);
   };
 
@@ -108,23 +86,18 @@ const Content = () => {
   };
 
   return (
-    <main className={`${styles.main} ${themeClass}`}>
+    <main className={`${styles.main}`}>
       <Canvas>
-        <ambientLight intensity={isDarkMode ? 0.2 : 1} />
-        <pointLight position={[0, 40, 0]} intensity={isDarkMode ? 0.3 : 0} />
+        <ambientLight intensity={1} />
+        <ambientLight intensity={0.5} />
         <Sky distance={450000} sunPosition={[0, 40, 0]} inclination={0} />
-        {client && <Model path="/assets/crt_monitor.glb" zoom={zoom} />}
+        {client && <Model path="/assets/monitor.glb" zoom={zoom} />}
       </Canvas>
       <div className={styles.title}>
         <h2>david.mov</h2>
         <p>Please enjoy.</p>
       </div>
-
-      {/* <div className={styles.darkmode} onClick={toggleTheme}>
-        {isDarkMode ? <Moon /> : <Sun />}
-      </div> */}
       {!client && <LoadingAnimation className={styles.loader} />}
-      {/* <div className={styles.social}>Made with ❤️ by David Imel</div> */}
       <div className={styles.scroll} ref={scrollContainerRef}>
         <motion.div
           className={styles.scrollbar}
