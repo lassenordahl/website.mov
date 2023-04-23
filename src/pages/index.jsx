@@ -22,6 +22,7 @@ const videoIds = [
   process.env.NEXT_PUBLIC_VIDEO_ID_ONE,
   process.env.NEXT_PUBLIC_VIDEO_ID_TWO,
   process.env.NEXT_PUBLIC_VIDEO_ID_THREE,
+  process.env.NEXT_PUBLIC_VIDEO_ID_FOUR,
 ];
 
 export const fadeIn = (delay, duration) => ({
