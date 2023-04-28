@@ -27,7 +27,11 @@ const videoIds = [
 
 export const fadeIn = (delay, duration) => ({
   initial: { opacity: 0, y: 20 },
-  animate: { opacity: 1, y: 0, transition: { duration: duration || 0.5, delay: delay } },
+  animate: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: duration || 0.5, delay: delay },
+  },
 });
 
 const Model = ({ path, zoom, video }) => {
