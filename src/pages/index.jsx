@@ -1,22 +1,18 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import Head from "next/head";
-import { Canvas, useThree } from "@react-three/fiber";
-import {
-  useGLTF,
-  Html,
-  PresentationControls,
-  Sky,
-  Plane,
-} from "@react-three/drei";
-import { ArrowLeft, ArrowRight, AlignJustify } from "react-feather";
+import { Canvas, useThree, useFrame } from "@react-three/fiber";
+import { useGLTF, Html, PresentationControls, Plane } from "@react-three/drei";
+import { ArrowLeft, ArrowRight, ZoomIn, ZoomOut, Info } from "react-feather";
 import { motion } from "framer-motion";
 import * as THREE from "three";
 
 import { useClient, useTimeline } from "../hooks";
 import { ThemeProvider } from "../context/themeContext";
 import { LoadingAnimation } from "../components/loadingAnimation";
+import { InfoPanel } from "../components/infoPanel";
 
 import styles from "./index.module.scss";
+import { Button } from "../components/button";
 
 const videoIds = [
   process.env.NEXT_PUBLIC_VIDEO_ID_ONE,
@@ -33,6 +29,36 @@ export const fadeIn = (delay, duration) => ({
     transition: { duration: duration || 0.5, delay: delay },
   },
 });
+
+const RotatingObject = ({ path, scale, offset }) => {
+  const { scene } = useGLTF(path);
+  const mesh = useRef();
+  const radiusX = 4; // Define the radius of the oval on the X axis
+  const radiusY = 3; // Define the radius of the oval on the Y axis
+  const rotationSpeed = 0.003; // Define the rotation speed
+
+  let angle = 0; // Initialize the angle
+
+  // Generate random rotation speeds
+  const rotationSpeedX = Math.random() * 0.005;
+  const rotationSpeedY = Math.random() * 0.005;
+  const rotationSpeedZ = Math.random() * 0.005;
+
+  useFrame(() => {
+    if (mesh.current) {
+      angle += rotationSpeed; // Increment the angle
+      mesh.current.position.x = radiusX * Math.cos(angle + offset);
+      mesh.current.position.y = radiusY * Math.sin(angle + offset) - 0.5;
+
+      // Apply the rotations.
+      mesh.current.rotation.x += rotationSpeedX;
+      mesh.current.rotation.y += rotationSpeedY;
+      mesh.current.rotation.z += rotationSpeedZ;
+    }
+  });
+
+  return <primitive ref={mesh} object={scene} scale={scale} />;
+};
 
 const Model = ({ path, zoom, video }) => {
   const { scene } = useGLTF(path);
@@ -66,12 +92,12 @@ const Model = ({ path, zoom, video }) => {
     >
       <primitive
         object={scene}
-        position={[-1.7, -2.2, getZoom()]}
+        position={[-1.73, -2.2, getZoom()]}
         scale={[0.8, 0.8, 0.8]}
       >
         <Html wrapperClass={styles.computer} position={[2.1, 3, 0]}>
           <iframe
-            style={{ transform: `scale(${0.9 + 0.3 * (zoom / 50)}` }}
+            style={{ transform: `scale(${1 + 0.35 * (zoom / 80)}` }}
             src={`https://www.youtube.com/embed/${video}?autoplay=1`}
           />
         </Html>
@@ -101,109 +127,132 @@ const Model = ({ path, zoom, video }) => {
 };
 
 const Content = () => {
-  const scrollContainerRef = useRef(null);
   const [zoom, setZoom] = useState(0);
+  const [infoVisible, setInfoVisible] = useState(false);
   const { client } = useClient();
   const { step, next, prev } = useTimeline(0, videoIds.length - 1, true);
   const [video, setVideo] = useState(videoIds[step]);
-
-  const handleDrag = (info) => {
-    const scrollbarHeight = 12 * 16; // Height of the scrollbar in pixels (assuming 1rem = 16px)
-
-    if (!scrollContainerRef.current) return;
-
-    const containerHeight = scrollContainerRef.current.offsetHeight;
-
-    // Calculate the percentage based on the y position.
-    const percentage =
-      100 - (info.point.y / (containerHeight - scrollbarHeight)) * 100;
-
-    // Clamp the percentage value between 0 and 100
-    const clampedPercentage = Math.floor(Math.min(Math.max(percentage, 0), 80));
-    setZoom(clampedPercentage);
-  };
-
-  const getDragConstraints = () => {
-    if (!scrollContainerRef.current) {
-      return { top: 0, bottom: 0 };
-    }
-
-    const containerHeight = scrollContainerRef.current.offsetHeight;
-    const scrollbarHeight = 12 * 16; // 12rem in pixels (assuming 1rem = 16px)
-    const padding = 2 * 16; // 6rem in pixels (assuming 1rem = 16px)
-
-    return { top: -(containerHeight - scrollbarHeight - padding), bottom: 0 };
-  };
 
   useEffect(() => {
     // If step changes, set the new video ID.
     setVideo(videoIds[step]);
   }, [step]);
 
-  console.log(video);
+  const scene = useMemo(() => {
+    return (
+      <>
+        <ambientLight intensity={0.4} />
+        <pointLight position={[-10, 10, 0]} intensity={0.6} />
+        {client && (
+          <Model path="/assets/monitor.glb" zoom={zoom} video={video} />
+        )}
+      </>
+    );
+  }, [client, video, zoom]);
+
+  const rotation = useMemo(() => {
+    return (
+      <>
+        <RotatingObject
+          path="/assets/mouse.gltf"
+          scale={[0.2, 0.2, 0.2]}
+          offset={0}
+        />
+        <RotatingObject
+          path="/assets/xt1.gltf"
+          scale={[0.1, 0.1, 0.1]}
+          offset={2}
+        />
+        <RotatingObject
+          path="/assets/flashdrive.glb"
+          scale={[0.2, 0.2, 0.2]}
+          offset={4}
+        />
+      </>
+    );
+  }, []);
 
   return (
-    <main className={`${styles.main}`}>
-      <motion.div
-        initial="initial"
-        animate="animate"
-        variants={fadeIn(1.2, 1)}
-        style={{ width: "100vw", height: "100vh" }}
-      >
-        <Canvas>
-          <ambientLight intensity={0.5} />
-          <pointLight position={[-10, 10, 0]} intensity={0.8} />
-          {client && (
-            <Model path="/assets/monitor.glb" zoom={zoom} video={video} />
-          )}
-        </Canvas>
-      </motion.div>
-      <div className={styles.title}>
-        <motion.h2 initial="initial" animate="animate" variants={fadeIn(0)}>
-          david.mov
-        </motion.h2>
-        <motion.p initial="initial" animate="animate" variants={fadeIn(0.3)}>
-          Please enjoy.
-        </motion.p>
-      </div>
-      {!client && <LoadingAnimation className={styles.loader} />}
-      <motion.div
-        initial="initial"
-        animate="animate"
-        variants={fadeIn(1.5)}
-        className={styles.scroll}
-        ref={scrollContainerRef}
-      >
-        <motion.div
-          className={styles.scrollbar}
-          drag="y"
-          onDrag={(_, info) => handleDrag(info)}
-          dragConstraints={getDragConstraints()}
-          whileDrag={{ scale: 1.05 }}
-          dragMomentum={false}
-        >
-          <AlignJustify />
-        </motion.div>
-      </motion.div>
-      <div className={styles.cta}>
+    <>
+      <div className={styles.noise} />
+      <main className={`${styles.main}`}>
         <motion.div
           initial="initial"
           animate="animate"
-          variants={fadeIn(0.6)}
-          onClick={() => prev()}
+          variants={fadeIn(1.2, 1)}
+          style={{ width: "100vw", height: "100vh" }}
         >
-          <ArrowLeft /> prev
+          <Canvas>
+            {scene}
+            {rotation}
+          </Canvas>
         </motion.div>
-        <motion.div
-          initial="initial"
-          animate="animate"
-          variants={fadeIn(0.9)}
-          onClick={() => next()}
-        >
-          next <ArrowRight />
+        <div className={styles.title}>
+          <motion.h2 initial="initial" animate="animate" variants={fadeIn(0)}>
+            david.mov
+          </motion.h2>
+          <motion.p
+            initial="initial"
+            animate="animate"
+            variants={fadeIn(0.3)}
+            className={styles.info}
+          >
+            Please enjoy.
+          </motion.p>
+          <motion.div
+            initial="initial"
+            animate="animate"
+            variants={fadeIn(0.3)}
+          >
+            {/* <Info onClick={() => setInfoVisible(true)} /> */}
+            {/* <InfoPanel visible={infoVisible} /> */}
+          </motion.div>
+        </div>
+        {!client && <LoadingAnimation className={styles.loader} />}
+        <div className={styles.cta}>
+          <motion.div
+            initial="initial"
+            animate="animate"
+            variants={fadeIn(0.6)}
+            onClick={() => prev()}
+          >
+            <Button className={styles.button}>
+              <ArrowLeft />
+            </Button>
+          </motion.div>
+          <motion.div
+            initial="initial"
+            animate="animate"
+            variants={fadeIn(0.9)}
+          >
+            <Button
+              className={styles.button}
+              onClick={() => setZoom(zoom < 50 ? 50 : -80)}
+            >
+              {zoom < 50 ? <ZoomIn /> : <ZoomOut />}
+            </Button>
+          </motion.div>
+          <motion.div
+            initial="initial"
+            animate="animate"
+            variants={fadeIn(1.2)}
+            onClick={() => next()}
+          >
+            <Button className={styles.button}>
+              <ArrowRight />
+            </Button>
+          </motion.div>
+        </div>
+        <motion.div className={styles.extraSites}>
+          <a href="https://www.download.zip" target="_blank">
+            download.zip
+          </a>
+          <a href="https://www.feliznavi.dad" target="_blank">
+            feliznavi.dad
+          </a>
         </motion.div>
-      </div>
-    </main>
+      </main>
+    </>
   );
 };
 

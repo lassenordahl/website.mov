@@ -5,11 +5,10 @@
   align-items: center;
   justify-content: center;
   background: black;
+  z-index: 30;
 }
 
 .computer iframe {
-  // width: 170px;
-  // height: 150px;
   border: 0;
   border-radius: 3px;
   filter: grayscale(0.2);
@@ -31,7 +30,64 @@
 .main {
   width: 100vw;
   height: 100vh;
-  background: linear-gradient(to bottom, rgba(255,255,255,1) 0%, rgb(196, 196, 196) 100%);
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 1) 0%,
+    rgb(167, 167, 167) 100%
+  );
+  z-index: 10;
+}
+
+// This is taken from a CodePen! I'm coding on a plane right now so I
+// can't write the link, but if you just Google "TV Static CSS" it'll
+// pop up. I'll try to update the link before this goes live.
+.noise {
+  position: fixed;
+  top: -500px;
+  right: -500px;
+  left: -500px;
+  bottom: -500px;
+  background: transparent url("/assets/static.png") 0 0;
+  background-size: 320px 320px;
+  opacity: 1;
+  z-index: 0;
+  animation: noise 1s steps(8, end) infinite both;
+}
+
+@keyframes noise {
+  0% {
+    transform: translateX(0px, 0px);
+  }
+  10% {
+    transform: translate(-100px, 100px);
+  }
+  20% {
+    transform: translate(150px, -100px);
+  }
+  30% {
+    transform: translate(-100px, 100px);
+  }
+  40% {
+    transform: translate(100px, -150px);
+  }
+  50% {
+    transform: translate(-100px, 200px);
+  }
+  60% {
+    transform: translate(-200px, -100px);
+  }
+  70% {
+    transform: translate(50px, 100px);
+  }
+  80% {
+    transform: translate(100px, -150px);
+  }
+  90% {
+    transform: translate(0px, 200px);
+  }
+  100% {
+    transform: translate(-100px, 100px);
+  }
 }
 
 .body {
@@ -53,6 +109,9 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  background-color: rgba(255, 255, 255, 0.4);
+  padding: 0.5rem 2.5rem 1rem 2.5rem;
+  border-radius: 12px;
 
   h2 {
     text-decoration: underline;
@@ -78,7 +137,7 @@
 .scroll {
   position: absolute;
   right: 0;
-  top: 0;
+  bottom: 0;
   height: calc(100vh - 2rem);
   width: 2rem;
   margin-right: 1rem;
@@ -130,12 +189,12 @@
 
 .cta {
   position: absolute;
-  bottom: 3rem;
+  bottom: 4rem;
   left: 50%;
   transform: translate(-50%);
   display: flex;
   color: black;
-  gap: 3rem;
+  gap: 1.5rem;
 
   div {
     display: flex;
@@ -149,4 +208,25 @@
       font-weight: 800;
     }
   }
+}
+
+.extraSites {
+  position: absolute;
+  left: 50%;
+  bottom: 1.5rem;
+  transform: translate(-50%);
+  display: flex;
+  gap: 1rem;
+
+  a {
+    color: black;
+  }
+}
+
+.button {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  justify-content: center;
+  width: 5rem;
 }

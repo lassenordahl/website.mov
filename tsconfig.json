@@ -22,7 +22,7 @@
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    "src/pages/index.jsx",
+    "src/shaders/index.jsx",
     "src/components/videoPanel.jsx",
     "src/components/button.jsx",
     "src/components/youtubeVideo.jsx",
