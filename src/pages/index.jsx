@@ -68,9 +68,7 @@ const Model = ({ path, zoom, video }) => {
   gl.shadowMap.enabled = true;
   gl.shadowMap.type = THREE.PCFSoftShadowMap;
 
-  const getZoom = () => {
-    return (zoom / 80) * 1.5;
-  };
+  const getZoom = () => (zoom / 80) * 1.5;
 
   const enableShadows = (object) => {
     if (object.material) object.material.shadowSide = THREE.DoubleSide;
@@ -138,39 +136,31 @@ const Content = () => {
     setVideo(videoIds[step]);
   }, [step]);
 
-  const scene = useMemo(() => {
-    return (
-      <>
-        <ambientLight intensity={0.4} />
-        <pointLight position={[-10, 10, 0]} intensity={0.6} />
-        {client && (
-          <Model path="/assets/monitor.glb" zoom={zoom} video={video} />
-        )}
-      </>
-    );
-  }, [client, video, zoom]);
+  const scene = useMemo(() => (<>
+    <ambientLight intensity={0.4} />
+    <pointLight position={[-10, 10, 0]} intensity={0.6} />
+    {client && (
+      <Model path="/assets/monitor.glb" zoom={zoom} video={video} />
+    )}
+  </>), [client, video, zoom]);
 
-  const rotation = useMemo(() => {
-    return (
-      <>
-        <RotatingObject
-          path="/assets/mouse.gltf"
-          scale={[0.2, 0.2, 0.2]}
-          offset={0}
-        />
-        <RotatingObject
-          path="/assets/xt1.gltf"
-          scale={[0.1, 0.1, 0.1]}
-          offset={2}
-        />
-        <RotatingObject
-          path="/assets/flashdrive.glb"
-          scale={[0.2, 0.2, 0.2]}
-          offset={4}
-        />
-      </>
-    );
-  }, []);
+  const rotation = useMemo(() => (<>
+    <RotatingObject
+      path="/assets/mouse.gltf"
+      scale={[0.2, 0.2, 0.2]}
+      offset={0}
+    />
+    <RotatingObject
+      path="/assets/xt1.gltf"
+      scale={[0.1, 0.1, 0.1]}
+      offset={2}
+    />
+    <RotatingObject
+      path="/assets/flashdrive.glb"
+      scale={[0.2, 0.2, 0.2]}
+      offset={4}
+    />
+  </>), []);
 
   return (
     <>

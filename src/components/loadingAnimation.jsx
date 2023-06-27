@@ -12,9 +12,7 @@ export const LoadingAnimation = ({ className }) => {
     return () => clearInterval(interval);
   }, []);
 
-  const getOpacity = (dotNumber) => {
-    return visibleDot > dotNumber ? 1 : 0;
-  };
+  const getOpacity = dotNumber => visibleDot > dotNumber ? 1 : 0;
 
   const dotStyle = (dotNumber) => ({
     opacity: getOpacity(dotNumber),
