@@ -13,9 +13,7 @@ export const useClient = () => {
 export const useTimeline = (start, max, repeat = false) => {
   const [step, setStep] = useState(start);
 
-  const percent = useMemo(() => {
-    return Math.floor((step / max) * 100);
-  }, [step, max]);
+  const percent = useMemo(() => Math.floor((step / max) * 100), [step, max]);
 
   const prev = useCallback(() => {
     if (step > 0) setStep(step - 1);
